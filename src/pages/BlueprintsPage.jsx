@@ -9,10 +9,10 @@ import BlueprintCanvas from '../components/BlueprintCanvas.jsx'
 
 export default function BlueprintsPage() {
   const dispatch = useDispatch()
-  const { byAuthor, current, status } = useSelector((s) => s.blueprints)
+  const { byAuthor, current } = useSelector((s) => s.blueprints)
   const [authorInput, setAuthorInput] = useState('')
   const [selectedAuthor, setSelectedAuthor] = useState('')
-  const items = byAuthor[selectedAuthor] || []
+  const items = (selectedAuthor && byAuthor.data[selectedAuthor]) || []
 
   useEffect(() => {
     dispatch(fetchAuthors())
@@ -55,8 +55,9 @@ export default function BlueprintsPage() {
           <h3 style={{ marginTop: 0 }}>
             {selectedAuthor ? `${selectedAuthor}'s blueprints:` : 'Results'}
           </h3>
-          {status === 'loading' && <p>Cargando...</p>}
-          {!items.length && status !== 'loading' && <p>Sin resultados.</p>}
+          {byAuthor.status === 'loading' && <p>Cargando...</p>}
+          {byAuthor.error && <p style={{ color: '#f87171' }}>{byAuthor.error}</p>}
+          {!items.length && byAuthor.status !== 'loading' && !byAuthor.error && <p>Sin resultados.</p>}
           {!!items.length && (
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -114,8 +115,8 @@ export default function BlueprintsPage() {
       </section>
 
       <section className="card">
-        <h3 style={{ marginTop: 0 }}>Current blueprint: {current?.name || '—'}</h3>
-        <BlueprintCanvas points={current?.points || []} />
+        <h3 style={{ marginTop: 0 }}>Current blueprint: {current.data?.name || '—'}</h3>
+        <BlueprintCanvas points={current.data?.points || []} />
       </section>
     </div>
   )
