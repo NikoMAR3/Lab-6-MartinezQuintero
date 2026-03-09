@@ -3,6 +3,7 @@ import BlueprintsPage from './pages/BlueprintsPage.jsx'
 import BlueprintDetailPage from './pages/BlueprintDetailPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFound from './pages/NotFound.jsx'
+import CanvasPage from './pages/CanvasPage.jsx'
 
 export default function App() {
   return (
@@ -10,16 +11,16 @@ export default function App() {
       <header>
         <h1>ECI - Laboratorio de Blueprints en React</h1>
         <nav>
-          <NavLink to="/" end>
-            Blueprints
-          </NavLink>
+          <NavLink to="/" end>Blueprints</NavLink>
           <NavLink to="/login">Login</NavLink>
+          <NavLink to="/canvas">Canvas</NavLink>
         </nav>
       </header>
       <Routes>
         <Route path="/" element={<BlueprintsPage />} />
         <Route path="/blueprints/:author/:name" element={<BlueprintDetailPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/canvas" element={<CanvasPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
