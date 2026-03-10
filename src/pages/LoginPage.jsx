@@ -12,6 +12,7 @@ export default function LoginPage() {
     try {
       const { data } = await api.post('/auth/login', { username, password })
       localStorage.setItem('token', data.access_token)
+      localStorage.setItem('username', username)
       alert('Login exitoso')
     } catch (e) {
       setError('Credenciales inválidas o servidor no disponible')
