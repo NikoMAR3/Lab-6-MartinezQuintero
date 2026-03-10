@@ -4,6 +4,9 @@ import {
   fetchAuthors,
   fetchByAuthor,
   fetchBlueprint,
+  deleteBlueprint,
+  addPoint,
+  selectTop5Blueprints,
 } from '../features/blueprints/blueprintsSlice.js'
 import BlueprintCanvas from '../components/BlueprintCanvas.jsx'
 
@@ -13,6 +16,8 @@ export default function BlueprintsPage() {
   const [authorInput, setAuthorInput] = useState('')
   const [selectedAuthor, setSelectedAuthor] = useState('')
   const items = (selectedAuthor && byAuthor.data[selectedAuthor]) || []
+  const top5 = useSelector(selectTop5Blueprints)
+  const [pointInput, setPointInput] = useState({ x: '', y: '' })
 
   useEffect(() => {
     dispatch(fetchAuthors())
@@ -50,8 +55,33 @@ export default function BlueprintsPage() {
             </button>
           </div>
         </div>
-
+        <div className="card "> 
+        <thead>
+            <tr>
+              <th
+                style={{
+                  textAlign: 'left',
+                  padding: '10px',
+                }}
+              >
+                Top 5 blueprints of all users queried
+              </th>
+            </tr>
+          </thead>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
+            {top5.map((bp) => (
+            <div key={bp.name} style={{        
+              borderRadius: 6, 
+              padding: '6px 12px',
+              fontSize: 13
+          }}>
+          <strong>{bp.name}</strong>  { bp.points?.length || 0} pts
+          </div>
+          ))}
+          </div>
+        </div>
         <div className="card">
+          
           <h3 style={{ marginTop: 0 }}>
             {selectedAuthor ? `${selectedAuthor}'s blueprints:` : 'Results'}
           </h3>
@@ -82,7 +112,9 @@ export default function BlueprintsPage() {
                       Number of points
                     </th>
                     <th style={{ padding: '8px', borderBottom: '1px solid #334155' }}></th>
+                    
                   </tr>
+                  
                 </thead>
                 <tbody>
                   {items.map((bp) => (
@@ -99,25 +131,74 @@ export default function BlueprintsPage() {
                       >
                         {bp.points?.length || 0}
                       </td>
-                      <td style={{ padding: '8px', borderBottom: '1px solid #1f2937' }}>
-                        <button className="btn" onClick={() => openBlueprint(bp)}>
-                          Open
-                        </button>
-                      </td>
+                      <td
+  style={{
+    padding: '8px',
+    borderBottom: '1px solid #1f2937',
+    display: 'flex',
+    gap: '8px'
+  }}
+>
+  <button className="btn" onClick={() => openBlueprint(bp)}>
+    Open
+  </button>
+
+  <button
+    className="btn"
+    style={{ background: '#dc2626' }}
+    onClick={() =>
+      dispatch(deleteBlueprint({ author: bp.author, name: bp.name }))
+    }
+  >
+    Delete
+  </button>
+</td>
+                      
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           )}
+          
           <p style={{ marginTop: 12, fontWeight: 700 }}>Total user points: {totalPoints}</p>
         </div>
       </section>
 
       <section className="card">
-        <h3 style={{ marginTop: 0 }}>Current blueprint: {current.data?.name || '—'}</h3>
-        <BlueprintCanvas points={current.data?.points || []} />
-      </section>
+  <h3 style={{ marginTop: 0 }}>Current blueprint: {current.data?.name || '...'}</h3>
+  <BlueprintCanvas points={current.data?.points || []} />
+  
+  {current.data && (
+    <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+      <input
+        type="number"
+        placeholder="x"
+        className="input"
+        style={{ width: 70 }}
+        value={pointInput.x}
+        onChange={(e) => setPointInput(p => ({ ...p, x: e.target.value }))}
+      />
+      <input
+        type="number"
+        placeholder="y"
+        className="input"
+        style={{ width: 70 }}
+        value={pointInput.y}
+        onChange={(e) => setPointInput(p => ({ ...p, y: e.target.value }))}
+      />
+      <button className="btn primary"
+        onClick={() => dispatch(addPoint({ 
+          author: current.data.author, 
+          name: current.data.name, 
+          x: Number(pointInput.x), 
+          y: Number(pointInput.y) 
+        }))}>
+        Add Point
+      </button>
+    </div>
+  )}
+</section>
     </div>
   )
 }

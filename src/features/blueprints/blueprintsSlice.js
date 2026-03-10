@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice, createSelector } from '@reduxjs/toolkit'
 import api from '../../services/apiClient.js'
 
 export const fetchAuthors = createAsyncThunk('blueprints/fetchAuthors', async () => {
@@ -24,10 +24,32 @@ export const fetchBlueprint = createAsyncThunk(
   },
 )
 
+export const selectTop5Blueprints = createSelector(
+  (state) => state.blueprints.byAuthor.data,
+  (byAuthorData) => {
+    const allBlueprints = Object.values(byAuthorData).flatMap(items => items)
+    return allBlueprints
+      .sort((a, b) => b.points.length - a.points.length)
+      .slice(0, 5)
+  }
+)
+
+export const addPoint = createAsyncThunk('blueprints/addPoint', async ({ author, name, x, y }) => {
+  await api.put(`/blueprints/${encodeURIComponent(author)}/${encodeURIComponent(name)}/points`, { x, y })
+  return { author, name, x, y }
+})
+
+export const deleteBlueprint = createAsyncThunk('blueprints/deleteBlueprint', async ({ author, name }) => {
+  await api.delete(`/blueprints/${encodeURIComponent(author)}/${encodeURIComponent(name)}`)
+  return { author, name }
+})
+ 
 export const createBlueprint = createAsyncThunk('blueprints/createBlueprint', async (payload) => {
   const { data } = await api.post('/blueprints', payload)
   return data
 })
+
+
 
 const slice = createSlice({
   name: 'blueprints',
@@ -80,6 +102,42 @@ const slice = createSlice({
     .addCase(createBlueprint.fulfilled, (s, a) => {
       const bp = a.payload
       if (s.byAuthor.data[bp.author]) s.byAuthor.data[bp.author].push(bp)
+    })
+    .addCase(deleteBlueprint.fulfilled, (s, a) => {
+    const { author, name } = a.payload
+    if (s.byAuthor.data[author]) {
+      s.byAuthor.data[author] = s.byAuthor.data[author].filter(bp => bp.name !== name)
+      }
+    })
+    .addCase(addPoint.fulfilled, (s, a) => {
+    const { author, name, x, y } = a.payload
+    if (s.byAuthor.data[author]) {
+    const bp = s.byAuthor.data[author].find(b => b.name === name)
+    if (bp) bp.points.push({ x, y })
+    }
+    if (s.current.data?.author === author && s.current.data?.name === name) {
+      s.current.data.points.push({ x, y })
+    }
+    })
+    .addCase(addPoint.pending, (s, a) => {
+    const { author, name, x, y } = a.meta.arg
+    if (s.byAuthor.data[author]) {
+      const bp = s.byAuthor.data[author].find(b => b.name === name)
+    if (bp) bp.points.push({ x, y })
+    }
+    if (s.current.data?.author === author && s.current.data?.name === name) {
+    s.current.data.points.push({ x, y })
+    }
+    })
+    .addCase(addPoint.rejected, (s, a) => {
+    const { author, name, x, y } = a.meta.arg
+    if (s.byAuthor.data[author]) {
+    const bp = s.byAuthor.data[author].find(b => b.name === name)
+    if (bp) bp.points = bp.points.filter(p => !(p.x === x && p.y === y))
+    }
+    if (s.current.data?.author === author && s.current.data?.name === name) {
+    s.current.data.points = s.current.data.points.filter(p => !(p.x === x && p.y === y))
+    }
     })
   },
 })
