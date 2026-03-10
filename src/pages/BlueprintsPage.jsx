@@ -86,7 +86,14 @@ export default function BlueprintsPage() {
             {selectedAuthor ? `${selectedAuthor}'s blueprints:` : 'Results'}
           </h3>
           {byAuthor.status === 'loading' && <p>Cargando...</p>}
-          {byAuthor.error && <p style={{ color: '#f87171' }}>{byAuthor.error}</p>}
+          {byAuthor.error && (
+          <div style={{ background: '#7f1d1d', padding: '10px 16px', borderRadius: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ color: '#fca5a5' }}>{byAuthor.error}</span>
+            <button className="btn" onClick={() => dispatch(fetchByAuthor(selectedAuthor))}>
+            Reintentar
+            </button>
+          </div>
+          )}
           {!items.length && byAuthor.status !== 'loading' && !byAuthor.error && <p>Sin resultados.</p>}
           {!!items.length && (
             <div style={{ overflowX: 'auto' }}>
