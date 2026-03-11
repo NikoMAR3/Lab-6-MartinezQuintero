@@ -1,7 +1,9 @@
-import '@testing-library/jest-dom'
+import * as matchers from '@testing-library/jest-dom/matchers'
+import { expect } from 'vitest'
+
+expect.extend(matchers)
 
 // ---- Canvas mock para jsdom ----
-if (!HTMLCanvasElement.prototype.getContext) {
   HTMLCanvasElement.prototype.getContext = () => {
     const noop = () => {}
     return {
@@ -35,4 +37,4 @@ if (!HTMLCanvasElement.prototype.getContext) {
       setLineDash: noop,
     }
   }
-}
+

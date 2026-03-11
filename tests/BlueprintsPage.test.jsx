@@ -9,24 +9,24 @@ vi.mock('../src/features/blueprints/blueprintsSlice.js', () => ({
   fetchAuthors: () => ({ type: 'blueprints/fetchAuthors' }),
   fetchByAuthor: (author) => ({ type: 'blueprints/fetchByAuthor', payload: author }),
   fetchBlueprint: (payload) => ({ type: 'blueprints/fetchBlueprint', payload }),
+  deleteBlueprint: (payload) => ({ type: 'blueprints/deleteBlueprint', payload }),
+  addPoint: (payload) => ({ type: 'blueprints/addPoint', payload }),
+  selectTop5Blueprints: () => [],
 }))
 
 function makeStore(preloaded) {
   const slice = createSlice({
     name: 'blueprints',
     initialState: {
-      authors: [],
-      byAuthor: {},
-      current: null,
-      status: 'idle',
-      error: null,
+      authors: { data: [], status: 'idle', error: null },
+      byAuthor: { data: {}, status: 'idle', error: null },
+      current: { data: null, status: 'idle', error: null },
       ...preloaded,
     },
     reducers: {},
   })
   return configureStore({ reducer: { blueprints: slice.reducer } })
 }
-
 describe('BlueprintsPage', () => {
   it('despacha fetchByAuthor al hacer click en Get blueprints', () => {
     const store = makeStore()
