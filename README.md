@@ -160,11 +160,20 @@ Servicios:
 
 ---
 
+
+
 ## 🚌 Rutas principales
 
 - `/` -> Búsqueda y gestion de blueprints.
 - `/login` -> Autenticación de usuario.
 - `/canvas` -> Dibujo/creación de blueprint (protegida).
+
+
+# ⚠️ DISCLAIMER
+
+Es importante realizar el docker compose up en el back, si no la base de datos y en general lo que da sustento al frontend no funcionara(amenos que
+el .env cambie), es por eso que despues de que se inicie el backend si realizar los comandos de npm necesarios para que corra el front.El backend con 
+el cual se probo este proyecto es el de https://github.com/NikoMAR3/Martinez-Quintero-Lab-5.git .
 
 ---
 
